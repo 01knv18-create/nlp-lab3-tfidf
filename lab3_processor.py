@@ -45,8 +45,8 @@ class TfidfFaqAgent:
             "query": user_question,
             "best_question": self.faq_df.iloc[best_idx]['question'],
             "answer": self.faq_df.iloc[best_idx]['answer'],
-            "score": round(scores[best_idx], 4),
-            "top_3": [(idx, self.faq_df.iloc[idx]['question'], round(scores[idx], 4)) for idx in top_3_indices]
+            "score": round(scores[best_idx].item(), 4),
+            "top_3": [(idx, self.faq_df.iloc[idx]['question'],round(scores[idx].item(), 4) for idx in top_3_indices]
         }
 
 bot = TfidfFaqAgent(faq_data)
