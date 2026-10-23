@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
 
-# --- ЗАВДАННЯ 1: Геометрія текстів ---
+# === ЗАВДАННЯ 1 ===
 corpus = [
     "розподілені обчислення аналізують великі дані за допомогою кластера",
     "розподілені обчислення аналізують великі дані великі дані кластера кластера аналізують",
@@ -21,7 +21,7 @@ print("=== РЕЗУЛЬТАТИ ЗАВДАННЯ 1 ===")
 print("Матриця косинусної схожості:\n", df_cos.round(4))
 print("\nМатриця евклідової відстані:\n", df_euc.round(4))
 
-# --- ЗАВДАННЯ 2: FAQ-агент ---
+# === ЗАВДАННЯ 2 ===
 faq_data = pd.DataFrame([
     {"question": "що таке перенавчання моделі машинного навчання", "answer": "Це стан, коли модель показує високу точність на навчальних даних, але низьку на тестах."},
     {"question": "як працює токенізація на рівні окремих субслів bpe", "answer": "Алгоритм ітеративно об'єднує найбільш часті пари символів або байтів."},
@@ -38,15 +38,20 @@ class TfidfFaqAgent:
         
     def query(self, user_question):
         q_vec = self.vectorizer.transform([user_question])
-        scores = q_vec.dot(self.tfidf_matrix.T).toarray()[0]
-        best_idx = scores.argmax()
+        scores = q_vec.dot(self.tfidf_matrix.T).toarray()[0] # [0] перетворює матрицю у звичайний одновимірний масив
+        best_idx = int(scores.argmax())
         top_3_indices = scores.argsort()[-3:][::-1]
+        
+        top_3_list = []
+        for idx in top_3_indices:
+            top_3_list.append((int(idx), self.faq_df.iloc[int(idx)]['question'], round(float(scores[idx]), 4)))
+            
         return {
             "query": user_question,
             "best_question": self.faq_df.iloc[best_idx]['question'],
             "answer": self.faq_df.iloc[best_idx]['answer'],
-            "score": round(scores[best_idx].item(), 4),
-            "top_3": [(idx, self.faq_df.iloc[idx]['question'], round(scores[idx].item(), 4)) for idx in top_3_indices]
+            "score": round(float(scores[best_idx]), 4),
+            "top_3": top_3_list
         }
 
 bot = TfidfFaqAgent(faq_data)
