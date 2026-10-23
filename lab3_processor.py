@@ -38,7 +38,7 @@ class TfidfFaqAgent:
         
     def query(self, user_question):
         q_vec = self.vectorizer.transform([user_question])
-        scores = q_vec.dot(self.tfidf_matrix.T).toarray()
+        scores = q_vec.dot(self.tfidf_matrix.T).toarray()[0]
         best_idx = scores.argmax()
         top_3_indices = scores.argsort()[-3:][::-1]
         return {
@@ -46,7 +46,7 @@ class TfidfFaqAgent:
             "best_question": self.faq_df.iloc[best_idx]['question'],
             "answer": self.faq_df.iloc[best_idx]['answer'],
             "score": round(scores[best_idx].item(), 4),
-            "top_3": [(idx, self.faq_df.iloc[idx]['question'],round(scores[idx].item(), 4) for idx in top_3_indices]
+            "top_3": [(idx, self.faq_df.iloc[idx]['question'], round(scores[idx].item(), 4)) for idx in top_3_indices]
         }
 
 bot = TfidfFaqAgent(faq_data)
